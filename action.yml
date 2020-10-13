@@ -27,6 +27,9 @@ inputs:
   clientType:
     description: 'client type can be null to indicate event transformer'
     default: null
+  customHelpers:
+    description: 'Custom helpers can be null'
+    default: null
 runs:
   using: 'node12'
   main: 'dist/index.js'
