@@ -1,4 +1,5 @@
 import { ClientType, TemplateType } from 'Transformer/Core/TransformContract';
+import CustomTemplatingOptions from './Transformer/Model/CustomTemplatingOptions';
 /**
  * Template Manager provides methods to setup the template configuration
  * intializes template engines, registers all the templates provided by the config
@@ -12,7 +13,7 @@ export default class TemplateManager {
      * @returns {boolean} true if setup successful
      * @throws Error if setup fails
      */
-    static setupTemplateConfiguration(configFilePath: string): Promise<boolean>;
+    static setupTemplateConfiguration(configFilePath: string, customOptions?: CustomTemplatingOptions): Promise<boolean>;
     /**
      * Sets up the templates, picking from the path provided,
      * registering them to appropriate engines
@@ -26,7 +27,7 @@ export default class TemplateManager {
      * @returns {boolean} true if setup succesful
      * @throws Error if setup fails
      */
-    static setupTemplateConfigurationFromRepo(repo: string, branch: string, sourceType?: string, templateType?: TemplateType, clientType?: ClientType, accessToken?: string): Promise<boolean>;
+    static setupTemplateConfigurationFromRepo(repo: string, branch: string, sourceType?: string, templateType?: TemplateType, clientType?: ClientType, accessToken?: string, customOptions?: CustomTemplatingOptions): Promise<boolean>;
     /**
      * Read config file and deserialize the file appropriately
      *
@@ -47,6 +48,13 @@ export default class TemplateManager {
      * @param {string} accessToken - access token for private repo
      */
     private static registerAllTemplates;
+    /**
+     * Registers custom helpers and tags for a specific template engine
+     *
+     * @param {CustomEngineOptions} engineOption template type and the list of
+     * custom helpers and tag to register
+     */
+    private static registerHelpersAndTags;
     /**
      * Register template provided in the transformerConfig for the sourceType
      *
