@@ -10,5 +10,6 @@ export declare enum TemplateType {
  * The client for which the event card needs to be rendered
  */
 export declare enum ClientType {
-    Teams = "Teams"
+    Teams = "Teams",
+    Slack = "Slack"
 }

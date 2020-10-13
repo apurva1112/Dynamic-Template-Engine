@@ -10609,6 +10609,7 @@ async function run() {
         data = data.replace(/[\u0000-\u0019]+/g, '');
         core.debug(`Data After CleanUp: ${data}`);
         const dataJson = JSON.parse(data);
+        core.debug(`Done parsing input data`);
         const templateType = throwIfUndefined(TemplateTypeMap.get(templateTypeString));
         let clientType;
         if (clientTypeString) {
@@ -10624,6 +10625,7 @@ async function run() {
             const eventTransformer = new EventTransformer_1.default();
             renderedTemplate = await eventTransformer.ConstructEventJson(templateType, sourceType, dataJson);
         }
+        core.debug(`Calculated template: ${renderedTemplate}`);
         renderedTemplate = JSON.parse(renderedTemplate);
         core.setOutput('renderedTemplate', renderedTemplate);
         const octokit = github.getOctokit(accessToken);
@@ -21964,6 +21966,7 @@ var TemplateType;
 var ClientType;
 (function (ClientType) {
     ClientType["Teams"] = "Teams";
+    ClientType["Slack"] = "Slack";
 })(ClientType = exports.ClientType || (exports.ClientType = {}));
 
 
