@@ -21952,6 +21952,7 @@ var TemplateType;
 var ClientType;
 (function (ClientType) {
     ClientType["Teams"] = "Teams";
+    ClientType["Slack"] = "Slack";
 })(ClientType = exports.ClientType || (exports.ClientType = {}));
 
 
