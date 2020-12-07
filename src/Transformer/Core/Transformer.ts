@@ -1,5 +1,6 @@
 /** Copyright (c) 2020 GitHub. This code is licensed under MIT license (see LICENSE(https://github.com/github/event-transformer/blob/feature/chatops/LICENSE) for details) */
 /* eslint-disable class-methods-use-this */
+import * as core from '@actions/core';
 import TemplateEngineFactory from '../../Template/Core/TemplateEngineFactory';
 import { TemplateType } from './TransformContract';
 import BaseTransformConfigEntry from '../Model/BaseTransformConfigEntry';
@@ -37,6 +38,7 @@ export default abstract class Transformer<T extends BaseTransformConfigEntry> {
     path: string, key: string, templateType: TemplateType, accessToken?: string) {
     const templateFile = await Utility.fetchFile(fromRepo,
       sameRepo, repo, branch, path, accessToken);
+    core.debug(`${templateFile}`);
     const templateEngine = TemplateEngineFactory.getInstance().getTemplateEngine(templateType);
     templateEngine.registerTemplate(key, templateFile);
   }
