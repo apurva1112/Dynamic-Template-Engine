@@ -10621,7 +10621,7 @@ async function run() {
             await TemplateManager_1.default.setupTemplateConfigurationFromRepo(repoName, branch, sourceType, templateType, clientType, accessToken);
         }
         else {
-            await TemplateManager_1.default.setupTemplateConfiguration('TransformerConfig.json');
+            await TemplateManager_1.default.setupTemplateConfiguration(`${github.context.repo}\\TransformerConfig.json`);
         }
         if (clientType != null) {
             const cardRenderer = new CardRenderer_1.default();

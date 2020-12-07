@@ -60,7 +60,7 @@ async function run(): Promise<void> {
       await TemplateManager.setupTemplateConfigurationFromRepo(repoName, branch, sourceType,
         templateType, clientType, accessToken);
     } else {
-      await TemplateManager.setupTemplateConfiguration('TransformerConfig.json');
+      await TemplateManager.setupTemplateConfiguration(`${github.context.repo}\\TransformerConfig.json`);
     }
     if (clientType != null) {
       const cardRenderer = new CardRenderer();
