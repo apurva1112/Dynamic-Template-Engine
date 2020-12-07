@@ -53,7 +53,7 @@ export default class CardRenderer extends Transformer<CardRendererConfigEntry> {
     let path;
     let key;
     if (sameRepo === true) {
-      basepath = '/CardTemplate';
+      basepath = 'Chatops/Chatops/CardTemplate';
       path = `${basepath}/${transformConfig.ClientType}/${transformConfig.TemplateType}/${transformConfig.TemplateName}`;
       key = Utility.keyGenerator(CardRenderer.KEY_PREFIX, transformConfig.TemplateType,
         transformConfig.SourceType, transformConfig.ClientType);
