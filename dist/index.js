@@ -9730,6 +9730,8 @@ var _logger2 = _interopRequireDefault(_logger);
 
 var _internalProtoAccess = __webpack_require__(476);
 
+const core = __importStar(__webpack_require__(470));
+
 var VERSION = '4.7.6';
 exports.VERSION = VERSION;
 var COMPILER_REVISION = 8;
