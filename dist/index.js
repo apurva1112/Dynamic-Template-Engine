@@ -9730,7 +9730,7 @@ var _logger2 = _interopRequireDefault(_logger);
 
 var _internalProtoAccess = __webpack_require__(476);
 
-const core = __importStar(__webpack_require__(470));
+var _core = __webpack_require__(470);
 
 var VERSION = '4.7.6';
 exports.VERSION = VERSION;
@@ -9769,7 +9769,7 @@ HandlebarsEnvironment.prototype = {
   log: _logger2['default'].log,
 
   registerHelper: function registerHelper(name, fn) {
-    core.debug(`registerhelper name1 ${name}, ${fn}`);
+    _core.debug(`registerhelper name1 ${name}, ${fn}`);
     if (_utils.toString.call(name) === objectType) {
       if (fn) {
         throw new _exception2['default']('Arg not supported with multiple helpers');
