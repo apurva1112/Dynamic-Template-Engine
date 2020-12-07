@@ -38,7 +38,6 @@ export default abstract class Transformer<T extends BaseTransformConfigEntry> {
     path: string, key: string, templateType: TemplateType, accessToken?: string) {
     const templateFile = await Utility.fetchFile(fromRepo,
       sameRepo, repo, branch, path, accessToken);
-    core.debug(`${templateFile}`);
     const templateEngine = TemplateEngineFactory.getInstance().getTemplateEngine(templateType);
     templateEngine.registerTemplate(key, templateFile);
   }
