@@ -24,7 +24,7 @@ export default class TemplateManager {
    */
   public static async setupTemplateConfiguration(configFilePath: string): Promise<boolean> {
     try {
-      const transformerConfig = await this.readConfigFile(configFilePath, '', '', false);
+      const transformerConfig = await this.readConfigFile(configFilePath, true, '', '', false);
       await this.registerAllTemplates(false, new CardRenderer(), transformerConfig.cardRenderer, '', '');
       await this.registerAllTemplates(false, new EventTransformer(), transformerConfig.eventTransformer, '', '');
     } catch (error) {
@@ -55,7 +55,7 @@ export default class TemplateManager {
     sourceType?: string, templateType?: TemplateType, clientType?: ClientType,
     accessToken?: string): Promise<boolean> {
     try {
-      const transformerConfig = await this.readConfigFile('TransformerConfig.json', repo, branch, true);
+      const transformerConfig = await this.readConfigFile('TransformerConfig.json', false, repo, branch, true);
       if (sourceType != null && templateType != null) {
         if (clientType != null) {
           await this.registerSpecificTemplate(true, new CardRenderer(),
@@ -91,9 +91,9 @@ export default class TemplateManager {
    * @param {string} branch - branch with the config
    * @param {boolean} fromRepo - specifies if file from repo or from local machine
    */
-  private static async readConfigFile(filePath: string, repo: string, branch: string,
+  private static async readConfigFile(filePath: string, sameRepo:boolean, repo: string, branch: string,
     fromRepo: boolean, accessToken?: string): Promise<TransformerConfig> {
-    const data = await Utils.fetchFile(fromRepo, repo, branch, filePath, accessToken);
+    const data = await Utils.fetchFile(fromRepo, sameRepo, repo, branch, filePath, accessToken);
     try {
       return <TransformerConfig>JSON.parse(data.toString());
     } catch (error) {

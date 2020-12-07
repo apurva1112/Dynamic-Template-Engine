@@ -15191,7 +15191,7 @@ class Transformer {
      * @param {string} accessToken - access token for private repo
      */
     async readAndRegisterTemplate(fromRepo, repo, branch, path, key, templateType, accessToken) {
-        const templateFile = await Utility_1.default.fetchFile(fromRepo, repo, branch, path, accessToken);
+        const templateFile = await Utility_1.default.fetchFile(fromRepo, false, repo, branch, path, accessToken);
         const templateEngine = TemplateEngineFactory_1.default.getInstance().getTemplateEngine(templateType);
         templateEngine.registerTemplate(key, templateFile);
     }
@@ -17412,7 +17412,7 @@ class TemplateManager {
      */
     static async setupTemplateConfiguration(configFilePath) {
         try {
-            const transformerConfig = await this.readConfigFile(configFilePath, '', '', false);
+            const transformerConfig = await this.readConfigFile(configFilePath, true, '', '', false);
             await this.registerAllTemplates(false, new CardRenderer_1.default(), transformerConfig.cardRenderer, '', '');
             await this.registerAllTemplates(false, new EventTransformer_1.default(), transformerConfig.eventTransformer, '', '');
         }
@@ -17442,7 +17442,7 @@ class TemplateManager {
      */
     static async setupTemplateConfigurationFromRepo(repo, branch, sourceType, templateType, clientType, accessToken) {
         try {
-            const transformerConfig = await this.readConfigFile('TransformerConfig.json', repo, branch, true);
+            const transformerConfig = await this.readConfigFile('TransformerConfig.json', false, repo, branch, true);
             if (sourceType != null && templateType != null) {
                 if (clientType != null) {
                     await this.registerSpecificTemplate(true, new CardRenderer_1.default(), transformerConfig.cardRenderer, repo, branch, sourceType, templateType, clientType, accessToken);
@@ -17475,8 +17475,8 @@ class TemplateManager {
      * @param {string} branch - branch with the config
      * @param {boolean} fromRepo - specifies if file from repo or from local machine
      */
-    static async readConfigFile(filePath, repo, branch, fromRepo, accessToken) {
-        const data = await Utility_1.default.fetchFile(fromRepo, repo, branch, filePath, accessToken);
+    static async readConfigFile(filePath, sameRepo, repo, branch, fromRepo, accessToken) {
+        const data = await Utility_1.default.fetchFile(fromRepo, sameRepo, repo, branch, filePath, accessToken);
         try {
             return JSON.parse(data.toString());
         }
@@ -21808,11 +21808,14 @@ class Utility {
      * @param {boolean} branch - name of the branch
      * @param {string} filePath - the path of the file to read
      */
-    static async fetchFile(fromRepo, repo, branch, filePath, accessToken) {
+    static async fetchFile(fromRepo, sameRepo, repo, branch, filePath, accessToken) {
         let file = '';
         try {
             if (fromRepo) {
                 file = await this.getFile(repo, branch, filePath, accessToken);
+            }
+            else if (sameRepo) {
+                file = fs.readFileSync(path.resolve(filePath)).toString();
             }
             else {
                 file = fs.readFileSync(path.resolve(__dirname, `../${filePath}`)).toString();

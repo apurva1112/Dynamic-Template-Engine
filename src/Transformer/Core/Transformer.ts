@@ -33,7 +33,7 @@ export default abstract class Transformer<T extends BaseTransformConfigEntry> {
    */
   protected async readAndRegisterTemplate(fromRepo: boolean, repo:string, branch:string,
     path: string, key: string, templateType: TemplateType, accessToken?: string) {
-    const templateFile = await Utility.fetchFile(fromRepo, repo, branch, path, accessToken);
+    const templateFile = await Utility.fetchFile(fromRepo, false, repo, branch, path, accessToken);
     const templateEngine = TemplateEngineFactory.getInstance().getTemplateEngine(templateType);
     templateEngine.registerTemplate(key, templateFile);
   }

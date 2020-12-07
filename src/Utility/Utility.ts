@@ -48,12 +48,14 @@ export default class Utility {
    * @param {boolean} branch - name of the branch
    * @param {string} filePath - the path of the file to read
    */
-  public static async fetchFile(fromRepo: boolean, repo: string, branch: string, filePath: string,
+  public static async fetchFile(fromRepo: boolean, sameRepo:boolean, repo: string, branch: string, filePath: string,
     accessToken?: string): Promise<string> {
     let file = '';
     try {
       if (fromRepo) {
         file = await this.getFile(repo, branch, filePath, accessToken);
+      } else if (sameRepo) {
+        file = fs.readFileSync(path.resolve(filePath)).toString();
       } else {
         file = fs.readFileSync(path.resolve(__dirname, `../${filePath}`)).toString();
       }
