@@ -21817,11 +21817,11 @@ class Utility {
     static async fetchFile(fromRepo, sameRepo, repo, branch, filePath, accessToken) {
         let file = '';
         try {
-            if (fromRepo) {
-                file = await this.getFile(repo, branch, filePath, accessToken);
-            }
-            else if (sameRepo) {
+            if (sameRepo) {
                 file = fs.readFileSync(path.resolve(filePath)).toString();
+            }
+            else if (fromRepo) {
+                file = await this.getFile(repo, branch, filePath, accessToken);
             }
             else {
                 file = fs.readFileSync(path.resolve(__dirname, `../${filePath}`)).toString();
