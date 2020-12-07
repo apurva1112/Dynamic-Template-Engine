@@ -17674,9 +17674,19 @@ class CardRenderer extends Transformer_1.default {
      * @param {string} accessToken - access token for private repo
      */
     async registerTemplate(fromRepo, sameRepo, repo, branch, transformConfig, accessToken) {
-        const basepath = fromRepo ? '/CardTemplate' : 'CardTemplate';
-        const path = `${basepath}/${transformConfig.ClientType}/${transformConfig.TemplateType}/${transformConfig.TemplateName}`;
-        const key = Utility_1.default.keyGenerator(CardRenderer.KEY_PREFIX, transformConfig.TemplateType, transformConfig.SourceType, transformConfig.ClientType);
+        let basepath;
+        let path;
+        let key;
+        if (sameRepo === true) {
+            basepath = 'CardTemplate';
+            path = `${basepath}/${transformConfig.ClientType}/${transformConfig.TemplateType}/${transformConfig.TemplateName}`;
+            key = Utility_1.default.keyGenerator(CardRenderer.KEY_PREFIX, transformConfig.TemplateType, transformConfig.SourceType, transformConfig.ClientType);
+        }
+        else {
+            basepath = fromRepo ? '/CardTemplate' : 'CardTemplate';
+            path = `${basepath}/${transformConfig.ClientType}/${transformConfig.TemplateType}/${transformConfig.TemplateName}`;
+            key = Utility_1.default.keyGenerator(CardRenderer.KEY_PREFIX, transformConfig.TemplateType, transformConfig.SourceType, transformConfig.ClientType);
+        }
         await this.readAndRegisterTemplate(fromRepo, sameRepo, repo, branch, path, key, transformConfig.TemplateType, accessToken);
     }
 }
