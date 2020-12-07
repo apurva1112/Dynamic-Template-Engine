@@ -13,6 +13,9 @@ inputs:
     description: 'branch name here'
     required: true
     default: ${{ github.event.repository.default_branch }}
+  transformerInSameRepo:
+    description: 'Is repository same as the current repo'
+    default: 'false'
   data:
     description: 'input data to use for rendering'
     default: null
