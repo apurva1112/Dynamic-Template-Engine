@@ -41,18 +41,19 @@ export default class EventTransformer extends Transformer<EventTransformConfigEn
    * *** Internal function not exposed to outside the package ***
    *
    * @param {boolean} fromRepo - is an from repo or a local machine lookup
+   * @param {boolean} sameRepo - is config file in the same repo
    * @param {string} repo - repo with the config
    * @param {string} branch - branch with the config
    * @param {EventTransformConfigEntry} transformConfig - config details of the template to register
    * @param {string} accessToken - access token for private repo
    */
-  public async registerTemplate(fromRepo: boolean, repo:string, branch: string,
+  public async registerTemplate(fromRepo: boolean, sameRepo:boolean, repo:string, branch: string,
     transformConfig: EventTransformConfigEntry, accessToken?: string): Promise<void> {
     const basepath = fromRepo ? '/EventTemplate' : 'EventTemplate';
     const path = `${basepath}/${transformConfig.TemplateType}/${transformConfig.TemplateName}`;
     const key = Utility.keyGenerator(EventTransformer.KEY_PREFIX,
       transformConfig.TemplateType, transformConfig.SourceType);
-    await this.readAndRegisterTemplate(fromRepo, repo, branch, path, key,
+    await this.readAndRegisterTemplate(fromRepo, sameRepo, repo, branch, path, key,
       transformConfig.TemplateType, accessToken);
   }
 

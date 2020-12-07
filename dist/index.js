@@ -3662,16 +3662,17 @@ class EventTransformer extends Transformer_1.default {
      * *** Internal function not exposed to outside the package ***
      *
      * @param {boolean} fromRepo - is an from repo or a local machine lookup
+     * @param {boolean} sameRepo - is config file in the same repo
      * @param {string} repo - repo with the config
      * @param {string} branch - branch with the config
      * @param {EventTransformConfigEntry} transformConfig - config details of the template to register
      * @param {string} accessToken - access token for private repo
      */
-    async registerTemplate(fromRepo, repo, branch, transformConfig, accessToken) {
+    async registerTemplate(fromRepo, sameRepo, repo, branch, transformConfig, accessToken) {
         const basepath = fromRepo ? '/EventTemplate' : 'EventTemplate';
         const path = `${basepath}/${transformConfig.TemplateType}/${transformConfig.TemplateName}`;
         const key = Utility_1.default.keyGenerator(EventTransformer.KEY_PREFIX, transformConfig.TemplateType, transformConfig.SourceType);
-        await this.readAndRegisterTemplate(fromRepo, repo, branch, path, key, transformConfig.TemplateType, accessToken);
+        await this.readAndRegisterTemplate(fromRepo, sameRepo, repo, branch, path, key, transformConfig.TemplateType, accessToken);
     }
 }
 exports.default = EventTransformer;
@@ -15183,6 +15184,7 @@ class Transformer {
      * Fetch template file and register with appropriate template engine
      *
      * @param {boolean} fromRepo - is an from repo or a local machine lookup
+     * @param {string} sameRepo - file path of the config
      * @param {string} repo - repo with the config
      * @param {string} branch - branch with the config
      * @param {string} path - url/local path for the template file
@@ -15190,8 +15192,8 @@ class Transformer {
      * @param {TemplateType} templateType - type of templating engine ex. Handlebars, Liquid
      * @param {string} accessToken - access token for private repo
      */
-    async readAndRegisterTemplate(fromRepo, repo, branch, path, key, templateType, accessToken) {
-        const templateFile = await Utility_1.default.fetchFile(fromRepo, false, repo, branch, path, accessToken);
+    async readAndRegisterTemplate(fromRepo, sameRepo, repo, branch, path, key, templateType, accessToken) {
+        const templateFile = await Utility_1.default.fetchFile(fromRepo, sameRepo, repo, branch, path, accessToken);
         const templateEngine = TemplateEngineFactory_1.default.getInstance().getTemplateEngine(templateType);
         templateEngine.registerTemplate(key, templateFile);
     }
@@ -17413,8 +17415,8 @@ class TemplateManager {
     static async setupTemplateConfiguration(configFilePath) {
         try {
             const transformerConfig = await this.readConfigFile(configFilePath, true, '', '', false);
-            await this.registerAllTemplates(false, new CardRenderer_1.default(), transformerConfig.cardRenderer, '', '');
-            await this.registerAllTemplates(false, new EventTransformer_1.default(), transformerConfig.eventTransformer, '', '');
+            await this.registerAllTemplates(false, true, new CardRenderer_1.default(), transformerConfig.cardRenderer, '', '');
+            await this.registerAllTemplates(false, true, new EventTransformer_1.default(), transformerConfig.eventTransformer, '', '');
         }
         catch (error) {
             if (error instanceof TemplateError_1.TemplateEngineNotFound || error instanceof TemplateError_1.TemplateParseError
@@ -17452,8 +17454,8 @@ class TemplateManager {
                 }
             }
             else {
-                await this.registerAllTemplates(true, new CardRenderer_1.default(), transformerConfig.cardRenderer, repo, branch);
-                await this.registerAllTemplates(true, new EventTransformer_1.default(), transformerConfig.eventTransformer, repo, branch);
+                await this.registerAllTemplates(true, false, new CardRenderer_1.default(), transformerConfig.cardRenderer, repo, branch);
+                await this.registerAllTemplates(true, false, new EventTransformer_1.default(), transformerConfig.eventTransformer, repo, branch);
             }
         }
         catch (error) {
@@ -17471,6 +17473,7 @@ class TemplateManager {
      * Read config file and deserialize the file appropriately
      *
      * @param {string} filePath - file path of the config
+     * @param {string} sameRepo - file path of the config
      * @param {string} repo - repo with the config
      * @param {string} branch - branch with the config
      * @param {boolean} fromRepo - specifies if file from repo or from local machine
@@ -17489,18 +17492,19 @@ class TemplateManager {
      * Register all templates provided in the transformerConfig
      *
      * @param {boolean} fromRepo - is an from repo or a local machine lookup
+     * @param {string} sameRepo - file path of the config
      * @param {string} transformer - transformer whith which template should be registered
      * @param {BaseTransformConfigEntry} transformerConfigs - the template transformer configs
      * @param {string} repo - repo with the config
      * @param {string} branch - branch with the config
      * @param {string} accessToken - access token for private repo
      */
-    static async registerAllTemplates(fromRepo, transformer, transformerConfigs, repo, branch, accessToken) {
+    static async registerAllTemplates(fromRepo, sameRepo, transformer, transformerConfigs, repo, branch, accessToken) {
         // eslint-disable-next-line no-restricted-syntax
         for (const element of transformerConfigs) {
             try {
                 // eslint-disable-next-line no-await-in-loop
-                await transformer.registerTemplate(fromRepo, repo, branch, element, accessToken);
+                await transformer.registerTemplate(fromRepo, sameRepo, repo, branch, element, accessToken);
             }
             catch (error) {
                 if (error instanceof TemplateError_1.TemplateParseError) {
@@ -17533,7 +17537,7 @@ class TemplateManager {
                 (typeof element.ClientType === 'undefined' || element.ClientType === clientType)) {
                 try {
                     // eslint-disable-next-line no-await-in-loop
-                    await transformer.registerTemplate(fromRepo, repo, branch, element, accessToken);
+                    await transformer.registerTemplate(fromRepo, false, repo, branch, element, accessToken);
                 }
                 catch (error) {
                     if (error instanceof TemplateError_1.TemplateParseError) {
@@ -17663,16 +17667,17 @@ class CardRenderer extends Transformer_1.default {
      * *** Internal function not exposed to outside the package ***
      *
      * @param {boolean} fromRepo - is an from repo or a local machine lookup
+     * @param {boolean} sameRepo - is handlebar in the same repo
      * @param {string} repo - repo with the config
      * @param {string} branch - branch with the config
      * @param {CardRendererConfigEntry} transformConfig - config details of the template to register
      * @param {string} accessToken - access token for private repo
      */
-    async registerTemplate(fromRepo, repo, branch, transformConfig, accessToken) {
+    async registerTemplate(fromRepo, sameRepo, repo, branch, transformConfig, accessToken) {
         const basepath = fromRepo ? '/CardTemplate' : 'CardTemplate';
         const path = `${basepath}/${transformConfig.ClientType}/${transformConfig.TemplateType}/${transformConfig.TemplateName}`;
         const key = Utility_1.default.keyGenerator(CardRenderer.KEY_PREFIX, transformConfig.TemplateType, transformConfig.SourceType, transformConfig.ClientType);
-        await this.readAndRegisterTemplate(fromRepo, repo, branch, path, key, transformConfig.TemplateType, accessToken);
+        await this.readAndRegisterTemplate(fromRepo, sameRepo, repo, branch, path, key, transformConfig.TemplateType, accessToken);
     }
 }
 exports.default = CardRenderer;
@@ -21804,6 +21809,7 @@ class Utility {
      * Fetch file either from local machine or using an http call
      *
      * @param {boolean} fromRepo - is an from repo or a local machine lookup
+     * @param {boolean} sameRepo - is config file in the same repo
      * @param {string} repo - name of the repository
      * @param {boolean} branch - name of the branch
      * @param {string} filePath - the path of the file to read

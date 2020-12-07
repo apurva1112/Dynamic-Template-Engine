@@ -25,8 +25,8 @@ export default class TemplateManager {
   public static async setupTemplateConfiguration(configFilePath: string): Promise<boolean> {
     try {
       const transformerConfig = await this.readConfigFile(configFilePath, true, '', '', false);
-      await this.registerAllTemplates(false, new CardRenderer(), transformerConfig.cardRenderer, '', '');
-      await this.registerAllTemplates(false, new EventTransformer(), transformerConfig.eventTransformer, '', '');
+      await this.registerAllTemplates(false, true, new CardRenderer(), transformerConfig.cardRenderer, '', '');
+      await this.registerAllTemplates(false, true, new EventTransformer(), transformerConfig.eventTransformer, '', '');
     } catch (error) {
       if (error instanceof TemplateEngineNotFound || error instanceof TemplateParseError
         || error instanceof FileParseError || error instanceof EmptyFileError) {
@@ -67,9 +67,9 @@ export default class TemplateManager {
             accessToken);
         }
       } else {
-        await this.registerAllTemplates(true, new CardRenderer(),
+        await this.registerAllTemplates(true, false, new CardRenderer(),
           transformerConfig.cardRenderer, repo, branch);
-        await this.registerAllTemplates(true, new EventTransformer(),
+        await this.registerAllTemplates(true, false, new EventTransformer(),
           transformerConfig.eventTransformer, repo, branch);
       }
     } catch (error) {
@@ -87,11 +87,13 @@ export default class TemplateManager {
    * Read config file and deserialize the file appropriately
    *
    * @param {string} filePath - file path of the config
+   * @param {string} sameRepo - file path of the config
    * @param {string} repo - repo with the config
    * @param {string} branch - branch with the config
    * @param {boolean} fromRepo - specifies if file from repo or from local machine
    */
-  private static async readConfigFile(filePath: string, sameRepo:boolean, repo: string, branch: string,
+  private static async readConfigFile(filePath: string,
+    sameRepo:boolean, repo: string, branch: string,
     fromRepo: boolean, accessToken?: string): Promise<TransformerConfig> {
     const data = await Utils.fetchFile(fromRepo, sameRepo, repo, branch, filePath, accessToken);
     try {
@@ -106,20 +108,22 @@ export default class TemplateManager {
    * Register all templates provided in the transformerConfig
    *
    * @param {boolean} fromRepo - is an from repo or a local machine lookup
+   * @param {string} sameRepo - file path of the config
    * @param {string} transformer - transformer whith which template should be registered
    * @param {BaseTransformConfigEntry} transformerConfigs - the template transformer configs
    * @param {string} repo - repo with the config
    * @param {string} branch - branch with the config
    * @param {string} accessToken - access token for private repo
    */
-  private static async registerAllTemplates(fromRepo: boolean, transformer: Transformer<any>,
+  private static async registerAllTemplates(fromRepo: boolean,
+    sameRepo:boolean, transformer: Transformer<any>,
     transformerConfigs: BaseTransformConfigEntry[], repo:string, branch: string,
     accessToken?: string): Promise<void> {
     // eslint-disable-next-line no-restricted-syntax
     for (const element of transformerConfigs) {
       try {
         // eslint-disable-next-line no-await-in-loop
-        await transformer.registerTemplate(fromRepo, repo, branch, element, accessToken);
+        await transformer.registerTemplate(fromRepo, sameRepo, repo, branch, element, accessToken);
       } catch (error) {
         if (error instanceof TemplateParseError) {
           throw new TemplateParseError(`Failed to parse template with name: ${element.TemplateName} 
@@ -153,7 +157,7 @@ export default class TemplateManager {
         (typeof (element as any).ClientType === 'undefined' || (element as any).ClientType === clientType)) {
         try {
           // eslint-disable-next-line no-await-in-loop
-          await transformer.registerTemplate(fromRepo, repo, branch, element, accessToken);
+          await transformer.registerTemplate(fromRepo, false, repo, branch, element, accessToken);
         } catch (error) {
           if (error instanceof TemplateParseError) {
             throw new TemplateParseError(`Failed to parse template with name: ${element.TemplateName} 
