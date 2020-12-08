@@ -10598,6 +10598,15 @@ async function run() {
         const sourceType = core.getInput('sourceType', options);
         const clientTypeString = core.getInput('clientType');
         const accessToken = core.getInput('accessToken');
+        const customHelperString = core.getInput('customHelpers');
+        const customHelpers = JSON.parse(customHelperString);
+        const customHelperWithFunc = {};
+        Object.entries(customHelpers).forEach(k => {
+            customHelperWithFunc[k[0]] = eval(k[1]);
+        });
+        const customTemplatingOptions = {
+            engineOptions: []
+        };
         const transformerInSameRepo = core.getInput('transformerInSameRepo');
         let data = core.getInput('data');
         core.debug(`Data Received: ${data}`);
@@ -10620,12 +10629,20 @@ async function run() {
         if (clientTypeString) {
             clientType = throwIfUndefined(ClientTypeMap.get(clientTypeString));
         }
+
+        const customEngineOptions = {
+          templateType: templateType,
+          customHelpers: customHelperWithFunc
+      };
+      customTemplatingOptions.engineOptions = [customEngineOptions];
+      core.debug(`CustomTemplatingOptions: ${customTemplatingOptions}`);
+      core.debug(`CustomEngineOptions: ${customTemplatingOptions.engineOptions[0]}`);
         let renderedTemplate;
         if (transformerInSameRepo === 'false') {
-            await TemplateManager_1.default.setupTemplateConfigurationFromRepo(repoName, branch, sourceType, templateType, clientType, accessToken);
+            await TemplateManager_1.default.setupTemplateConfigurationFromRepo(repoName, branch, sourceType, templateType, clientType, accessToken, customTemplatingOptions);
         }
         else {
-            await TemplateManager_1.default.setupTemplateConfiguration('TransformerConfig.json');
+            await TemplateManager_1.default.setupTemplateConfiguration('TransformerConfig.json', customTemplatingOptions);
         }
         if (clientType != null) {
             const cardRenderer = new CardRenderer_1.default();
@@ -10994,6 +11011,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 /** Copyright (c) 2020 GitHub. This code is licensed under MIT license (see LICENSE(https://github.com/github/event-transformer/blob/feature/chatops/LICENSE) for details) */
 const Handlebars = __importStar(__webpack_require__(635));
+const FunctionalityError_1 = __webpack_require__(475);
 const TemplateError_1 = __webpack_require__(958);
 class HandleBarsTemplateEngine {
     constructor() {
@@ -11032,6 +11050,30 @@ class HandleBarsTemplateEngine {
         }
         return preCompiledTemplate(dataModel);
     }
+     /**
+      * Register custom helper functions with template engine.
+      *
+      * @param helperName name of the helper to register
+      * @param helperFunc the implementation of helper function
+      */
+    // eslint-disable-next-line class-methods-use-this
+    registerHelper(helperName, helperFunc) {
+      try {
+          Handlebars.registerHelper(helperName, helperFunc);
+      }
+      catch (error) {
+          throw new FunctionalityError_1.CustomHelperRegisterError(`Registration of custom helper: ${helperName} failed with ERROR: ${error.message} `);
+      }
+  }
+  /**
+  * Register custom tag with template engine.
+  *
+  * @throws FunctionalityNotSupportedError if the engine does not support custom tags/extensions
+  */
+  // eslint-disable-next-line class-methods-use-this
+  registerTag() {
+      throw new FunctionalityError_1.FunctionalityNotSupportedError('HandleBars does not support custom tags or extensions');
+  }
 }
 exports.default = HandleBarsTemplateEngine;
 
@@ -14727,7 +14769,38 @@ SafeString.prototype.toString = SafeString.prototype.toHTML = function () {
 exports['default'] = SafeString;
 module.exports = exports['default'];
 //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uLy4uLy4uL2xpYi9oYW5kbGViYXJzL3NhZmUtc3RyaW5nLmpzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7Ozs7QUFDQSxTQUFTLFVBQVUsQ0FBQyxNQUFNLEVBQUU7QUFDMUIsTUFBSSxDQUFDLE1BQU0sR0FBRyxNQUFNLENBQUM7Q0FDdEI7O0FBRUQsVUFBVSxDQUFDLFNBQVMsQ0FBQyxRQUFRLEdBQUcsVUFBVSxDQUFDLFNBQVMsQ0FBQyxNQUFNLEdBQUcsWUFBVztBQUN2RSxTQUFPLEVBQUUsR0FBRyxJQUFJLENBQUMsTUFBTSxDQUFDO0NBQ3pCLENBQUM7O3FCQUVhLFVBQVUiLCJmaWxlIjoic2FmZS1zdHJpbmcuanMiLCJzb3VyY2VzQ29udGVudCI6WyIvLyBCdWlsZCBvdXQgb3VyIGJhc2ljIFNhZmVTdHJpbmcgdHlwZVxuZnVuY3Rpb24gU2FmZVN0cmluZyhzdHJpbmcpIHtcbiAgdGhpcy5zdHJpbmcgPSBzdHJpbmc7XG59XG5cblNhZmVTdHJpbmcucHJvdG90eXBlLnRvU3RyaW5nID0gU2FmZVN0cmluZy5wcm90b3R5cGUudG9IVE1MID0gZnVuY3Rpb24oKSB7XG4gIHJldHVybiAnJyArIHRoaXMuc3RyaW5nO1xufTtcblxuZXhwb3J0IGRlZmF1bHQgU2FmZVN0cmluZztcbiJdfQ==
+/***/ }),
 
+/***/ 475:
+/***/ (function(__unusedmodule, exports) {
+
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.CustomTagRegisterError = exports.CustomHelperRegisterError = exports.FunctionalityNotSupportedError = void 0;
+  class FunctionalityNotSupportedError extends Error {
+      constructor(message) {
+          super(message);
+          this.name = FunctionalityNotSupportedError.name;
+      }
+  }
+  exports.FunctionalityNotSupportedError = FunctionalityNotSupportedError;
+  class CustomHelperRegisterError extends Error {
+      constructor(message) {
+          super(message);
+          this.name = CustomHelperRegisterError.name;
+      }
+  }
+  exports.CustomHelperRegisterError = CustomHelperRegisterError;
+  class CustomTagRegisterError extends Error {
+      constructor(message) {
+          super(message);
+          this.name = CustomTagRegisterError.name;
+      }
+  }
+  exports.CustomTagRegisterError = CustomTagRegisterError;
+  
+  
 
 /***/ }),
 
@@ -17395,6 +17468,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const TemplateEngineFactory_1 = __importDefault(__webpack_require__(826));
 const Utility_1 = __importDefault(__webpack_require__(855));
 const CardRenderer_1 = __importDefault(__webpack_require__(664));
 const EventTransformer_1 = __importDefault(__webpack_require__(151));
@@ -17413,9 +17487,13 @@ class TemplateManager {
      * @returns {boolean} true if setup successful
      * @throws Error if setup fails
      */
-    static async setupTemplateConfiguration(configFilePath) {
+    static async setupTemplateConfiguration(configFilePath, customOptions) {
+      var _a;
         try {
             const transformerConfig = await this.readConfigFile(configFilePath, true, '', '', false);
+            (_a = customOptions === null || customOptions === void 0 ? void 0 : customOptions.engineOptions) === null || _a === void 0 ? void 0 : _a.forEach(engineOption => {
+              this.registerHelpersAndTags(engineOption);
+          });
             await this.registerAllTemplates(false, true, new CardRenderer_1.default(), transformerConfig.cardRenderer, '', '');
             await this.registerAllTemplates(false, true, new EventTransformer_1.default(), transformerConfig.eventTransformer, '', '');
         }
@@ -17443,9 +17521,13 @@ class TemplateManager {
      * @returns {boolean} true if setup succesful
      * @throws Error if setup fails
      */
-    static async setupTemplateConfigurationFromRepo(repo, branch, sourceType, templateType, clientType, accessToken) {
+    static async setupTemplateConfigurationFromRepo(repo, branch, sourceType, templateType, clientType, accessToken, customOptions) {
+      var _a;
         try {
             const transformerConfig = await this.readConfigFile('TransformerConfig.json', false, repo, branch, true);
+            (_a = customOptions === null || customOptions === void 0 ? void 0 : customOptions.engineOptions) === null || _a === void 0 ? void 0 : _a.forEach(engineOption => {
+              this.registerHelpersAndTags(engineOption);
+          });
             if (sourceType != null && templateType != null) {
                 if (clientType != null) {
                     await this.registerSpecificTemplate(true, new CardRenderer_1.default(), transformerConfig.cardRenderer, repo, branch, sourceType, templateType, clientType, accessToken);
@@ -17518,6 +17600,27 @@ class TemplateManager {
             }
         }
     }
+     /**
+     * Registers custom helpers and tags for a specific template engine
+     *
+     * @param {CustomEngineOptions} engineOption template type and the list of
+     * custom helpers and tag to register
+     */
+    static registerHelpersAndTags(engineOption) {
+      const engine = TemplateEngineFactory_1.default.getInstance().getTemplateEngine(engineOption.templateType);
+      const helpers = engineOption.customHelpers;
+      if (helpers) {
+          Object.keys(helpers).forEach(helperName => {
+              engine.registerHelper(helperName, helpers[helperName]);
+          });
+      }
+      const tags = engineOption.customTags;
+      if (tags) {
+          Object.keys(tags).forEach(tagName => {
+              engine.registerTag(tagName, tags[tagName]);
+          });
+      }
+  }
     /**
      * Register template provided in the transformerConfig for the sourceType
      *
@@ -23489,6 +23592,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 /** Copyright (c) 2020 GitHub. This code is licensed under MIT license (see LICENSE(https://github.com/github/event-transformer/blob/feature/chatops/LICENSE) for details) */
 const liquidjs_1 = __webpack_require__(252);
 const TemplateError_1 = __webpack_require__(958);
+const FunctionalityError_1 = __webpack_require__(475);
 class LiquidTemplateEngine {
     constructor() {
         this.preCompiledTemplateMap = new Map();
@@ -23527,6 +23631,37 @@ class LiquidTemplateEngine {
         }
         return this.engine.renderSync(preCompiledTemplate, dataModel);
     }
+     /**
+      * Register custom helper functions with template engine.
+      *
+      * @param helperName name of the helper to register
+      * @param helperFunc the implementation of helper function
+      */
+    // eslint-disable-next-line class-methods-use-this
+    registerHelper(helperName, helperFunc) {
+      try {
+          this.engine.registerFilter(helperName, helperFunc);
+      }
+      catch (error) {
+          throw new FunctionalityError_1.CustomHelperRegisterError(`Registration of custom helper: ${helperName} failed with ERROR: ${error.message} `);
+      }
+  }
+  /**
+  * Register custom tag with template engine.
+  *
+  * @param tagName name of the tag to register
+  * @param tagOptions tagOptions specific to the template engine
+  */
+  // eslint-disable-next-line class-methods-use-this
+  registerTag(tagName, tagOptions) {
+      try {
+          this.engine.registerTag(tagName, tagOptions);
+      }
+      catch (error) {
+          throw new FunctionalityError_1.CustomTagRegisterError(`Registration of custom Tag: ${tagName} failed with ERROR: ${error.message}`);
+      }
+  }
+}
 }
 exports.default = LiquidTemplateEngine;
 
