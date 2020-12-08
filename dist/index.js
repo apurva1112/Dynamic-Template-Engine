@@ -23660,8 +23660,7 @@ class LiquidTemplateEngine {
       catch (error) {
           throw new FunctionalityError_1.CustomTagRegisterError(`Registration of custom Tag: ${tagName} failed with ERROR: ${error.message}`);
       }
-  }
-}
+    }
 }
 exports.default = LiquidTemplateEngine;
 
