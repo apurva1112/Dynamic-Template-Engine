@@ -29,6 +29,15 @@ async function run(): Promise<void> {
     const sourceType: string = core.getInput('sourceType', options);
     const clientTypeString: string = core.getInput('clientType');
     const accessToken: string = core.getInput('accessToken');
+    const customHelperString: string = core.getInput('customHelpers');
+    const customHelpers = JSON.parse(customHelperString);
+    const customHelperWithFunc: {[helperName: string]: any} = {};
+    Object.entries(customHelpers).forEach(k => {
+        customHelperWithFunc[k[0]] = eval(k[1] as string);
+    });
+    const customTemplatingOptions: CustomTemplatingOptions = {
+      engineOptions: []
+    };
     const transformerInSameRepo: string = core.getInput('transformerInSameRepo');
     let data: string = core.getInput('data');
     core.debug(`Data Received: ${data}`);
@@ -58,9 +67,9 @@ async function run(): Promise<void> {
     let renderedTemplate: string;
     if (transformerInSameRepo === 'false') {
       await TemplateManager.setupTemplateConfigurationFromRepo(repoName, branch, sourceType,
-        templateType, clientType, accessToken);
+        templateType, clientType, accessToken, customTemplatingOptions);
     } else {
-      await TemplateManager.setupTemplateConfiguration('TransformerConfig.json');
+      await TemplateManager.setupTemplateConfiguration('TransformerConfig.json', customTemplatingOptions);
     }
     if (clientType != null) {
       const cardRenderer = new CardRenderer();
