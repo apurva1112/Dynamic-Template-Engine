@@ -3652,7 +3652,7 @@ class EventTransformer extends Transformer_1.default {
                 throw error;
             }
             else {
-                throw new TemplateError_1.TemplateRenderError(`Error applying template for Template Type: ${templateType} 
+                throw new TemplateError_1.TemplateRenderError(`Error applying template for Template Type: ${templateType}
         and Source Type: ${sourceType} with error message ${error.message}`);
             }
         }
@@ -3662,17 +3662,16 @@ class EventTransformer extends Transformer_1.default {
      * *** Internal function not exposed to outside the package ***
      *
      * @param {boolean} fromRepo - is an from repo or a local machine lookup
-     * @param {boolean} sameRepo - is config file in the same repo
      * @param {string} repo - repo with the config
      * @param {string} branch - branch with the config
      * @param {EventTransformConfigEntry} transformConfig - config details of the template to register
      * @param {string} accessToken - access token for private repo
      */
-    async registerTemplate(fromRepo, sameRepo, repo, branch, transformConfig, accessToken) {
+    async registerTemplate(fromRepo, repo, branch, transformConfig, accessToken) {
         const basepath = fromRepo ? '/EventTemplate' : 'EventTemplate';
         const path = `${basepath}/${transformConfig.TemplateType}/${transformConfig.TemplateName}`;
         const key = Utility_1.default.keyGenerator(EventTransformer.KEY_PREFIX, transformConfig.TemplateType, transformConfig.SourceType);
-        await this.readAndRegisterTemplate(fromRepo, sameRepo, repo, branch, path, key, transformConfig.TemplateType, accessToken);
+        await this.readAndRegisterTemplate(fromRepo, repo, branch, path, key, transformConfig.TemplateType, accessToken);
     }
 }
 exports.default = EventTransformer;
@@ -8600,7 +8599,7 @@ IndexedSourceMapConsumer.prototype.sourceContentFor =
  * and an object is returned with the following properties:
  *
  *   - line: The line number in the generated source, or null.  The
- *     line number is 1-based. 
+ *     line number is 1-based.
  *   - column: The column number in the generated source, or null.
  *     The column number is 0-based.
  */
@@ -9730,8 +9729,6 @@ var _logger2 = _interopRequireDefault(_logger);
 
 var _internalProtoAccess = __webpack_require__(476);
 
-var _core = __webpack_require__(470);
-
 var VERSION = '4.7.6';
 exports.VERSION = VERSION;
 var COMPILER_REVISION = 8;
@@ -9769,7 +9766,6 @@ HandlebarsEnvironment.prototype = {
   log: _logger2['default'].log,
 
   registerHelper: function registerHelper(name, fn) {
-    _core.debug(`registerhelper name1 ${name}, ${fn}`);
     if (_utils.toString.call(name) === objectType) {
       if (fn) {
         throw new _exception2['default']('Arg not supported with multiple helpers');
@@ -10607,10 +10603,9 @@ async function run() {
         const customTemplatingOptions = {
             engineOptions: []
         };
-        const transformerInSameRepo = core.getInput('transformerInSameRepo');
         let data = core.getInput('data');
         core.debug(`Data Received: ${data}`);
-        core.debug('Trying to remove invisble characters');
+        core.debug(`Trying to remove invisble characters`);
         data = data.replace(/\\n/g, '\\n')
             .replace(/\\'/g, "\\'")
             .replace(/\\"/g, '\\"')
@@ -10623,27 +10618,21 @@ async function run() {
         data = data.replace(/[\u0000-\u0019]+/g, '');
         core.debug(`Data After CleanUp: ${data}`);
         const dataJson = JSON.parse(data);
-        core.debug('Done parsing input data');
+        core.debug(`Done parsing input data`);
         const templateType = throwIfUndefined(TemplateTypeMap.get(templateTypeString));
         let clientType;
         if (clientTypeString) {
             clientType = throwIfUndefined(ClientTypeMap.get(clientTypeString));
         }
-
         const customEngineOptions = {
-          templateType: templateType,
-          customHelpers: customHelperWithFunc
-      };
-      customTemplatingOptions.engineOptions = [customEngineOptions];
-      core.debug(`CustomTemplatingOptions: ${customTemplatingOptions}`);
-      core.debug(`CustomEngineOptions: ${customTemplatingOptions.engineOptions[0]}`);
+            templateType: templateType,
+            customHelpers: customHelperWithFunc
+        };
+        customTemplatingOptions.engineOptions = [customEngineOptions];
+        core.debug(`CustomTemplatingOptions: ${customTemplatingOptions}`);
+        core.debug(`CustomEngineOptions: ${customTemplatingOptions.engineOptions[0]}`);
         let renderedTemplate;
-        if (transformerInSameRepo === 'false') {
-            await TemplateManager_1.default.setupTemplateConfigurationFromRepo(repoName, branch, sourceType, templateType, clientType, accessToken, customTemplatingOptions);
-        }
-        else {
-            await TemplateManager_1.default.setupTemplateConfiguration('TransformerConfig.json', customTemplatingOptions);
-        }
+        await TemplateManager_1.default.setupTemplateConfigurationFromRepo(repoName, branch, sourceType, templateType, clientType, accessToken, customTemplatingOptions);
         if (clientType != null) {
             const cardRenderer = new CardRenderer_1.default();
             renderedTemplate = await cardRenderer.ConstructCardJson(templateType, sourceType, clientType, dataJson);
@@ -11050,7 +11039,7 @@ class HandleBarsTemplateEngine {
         }
         return preCompiledTemplate(dataModel);
     }
-     /**
+    /**
       * Register custom helper functions with template engine.
       *
       * @param helperName name of the helper to register
@@ -11058,22 +11047,22 @@ class HandleBarsTemplateEngine {
       */
     // eslint-disable-next-line class-methods-use-this
     registerHelper(helperName, helperFunc) {
-      try {
-          Handlebars.registerHelper(helperName, helperFunc);
-      }
-      catch (error) {
-          throw new FunctionalityError_1.CustomHelperRegisterError(`Registration of custom helper: ${helperName} failed with ERROR: ${error.message} `);
-      }
-  }
-  /**
-  * Register custom tag with template engine.
-  *
-  * @throws FunctionalityNotSupportedError if the engine does not support custom tags/extensions
-  */
-  // eslint-disable-next-line class-methods-use-this
-  registerTag() {
-      throw new FunctionalityError_1.FunctionalityNotSupportedError('HandleBars does not support custom tags or extensions');
-  }
+        try {
+            Handlebars.registerHelper(helperName, helperFunc);
+        }
+        catch (error) {
+            throw new FunctionalityError_1.CustomHelperRegisterError(`Registration of custom helper: ${helperName} failed with ERROR: ${error.message} `);
+        }
+    }
+    /**
+    * Register custom tag with template engine.
+    *
+    * @throws FunctionalityNotSupportedError if the engine does not support custom tags/extensions
+    */
+    // eslint-disable-next-line class-methods-use-this
+    registerTag() {
+        throw new FunctionalityError_1.FunctionalityNotSupportedError('HandleBars does not support custom tags or extensions');
+    }
 }
 exports.default = HandleBarsTemplateEngine;
 
@@ -14769,38 +14758,39 @@ SafeString.prototype.toString = SafeString.prototype.toHTML = function () {
 exports['default'] = SafeString;
 module.exports = exports['default'];
 //# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uLy4uLy4uL2xpYi9oYW5kbGViYXJzL3NhZmUtc3RyaW5nLmpzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7Ozs7QUFDQSxTQUFTLFVBQVUsQ0FBQyxNQUFNLEVBQUU7QUFDMUIsTUFBSSxDQUFDLE1BQU0sR0FBRyxNQUFNLENBQUM7Q0FDdEI7O0FBRUQsVUFBVSxDQUFDLFNBQVMsQ0FBQyxRQUFRLEdBQUcsVUFBVSxDQUFDLFNBQVMsQ0FBQyxNQUFNLEdBQUcsWUFBVztBQUN2RSxTQUFPLEVBQUUsR0FBRyxJQUFJLENBQUMsTUFBTSxDQUFDO0NBQ3pCLENBQUM7O3FCQUVhLFVBQVUiLCJmaWxlIjoic2FmZS1zdHJpbmcuanMiLCJzb3VyY2VzQ29udGVudCI6WyIvLyBCdWlsZCBvdXQgb3VyIGJhc2ljIFNhZmVTdHJpbmcgdHlwZVxuZnVuY3Rpb24gU2FmZVN0cmluZyhzdHJpbmcpIHtcbiAgdGhpcy5zdHJpbmcgPSBzdHJpbmc7XG59XG5cblNhZmVTdHJpbmcucHJvdG90eXBlLnRvU3RyaW5nID0gU2FmZVN0cmluZy5wcm90b3R5cGUudG9IVE1MID0gZnVuY3Rpb24oKSB7XG4gIHJldHVybiAnJyArIHRoaXMuc3RyaW5nO1xufTtcblxuZXhwb3J0IGRlZmF1bHQgU2FmZVN0cmluZztcbiJdfQ==
+
+
 /***/ }),
 
 /***/ 475:
 /***/ (function(__unusedmodule, exports) {
 
-  "use strict";
+"use strict";
 
-  Object.defineProperty(exports, "__esModule", { value: true });
-  exports.CustomTagRegisterError = exports.CustomHelperRegisterError = exports.FunctionalityNotSupportedError = void 0;
-  class FunctionalityNotSupportedError extends Error {
-      constructor(message) {
-          super(message);
-          this.name = FunctionalityNotSupportedError.name;
-      }
-  }
-  exports.FunctionalityNotSupportedError = FunctionalityNotSupportedError;
-  class CustomHelperRegisterError extends Error {
-      constructor(message) {
-          super(message);
-          this.name = CustomHelperRegisterError.name;
-      }
-  }
-  exports.CustomHelperRegisterError = CustomHelperRegisterError;
-  class CustomTagRegisterError extends Error {
-      constructor(message) {
-          super(message);
-          this.name = CustomTagRegisterError.name;
-      }
-  }
-  exports.CustomTagRegisterError = CustomTagRegisterError;
-  
-  
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CustomTagRegisterError = exports.CustomHelperRegisterError = exports.FunctionalityNotSupportedError = void 0;
+class FunctionalityNotSupportedError extends Error {
+    constructor(message) {
+        super(message);
+        this.name = FunctionalityNotSupportedError.name;
+    }
+}
+exports.FunctionalityNotSupportedError = FunctionalityNotSupportedError;
+class CustomHelperRegisterError extends Error {
+    constructor(message) {
+        super(message);
+        this.name = CustomHelperRegisterError.name;
+    }
+}
+exports.CustomHelperRegisterError = CustomHelperRegisterError;
+class CustomTagRegisterError extends Error {
+    constructor(message) {
+        super(message);
+        this.name = CustomTagRegisterError.name;
+    }
+}
+exports.CustomTagRegisterError = CustomTagRegisterError;
+
 
 /***/ }),
 
@@ -15239,6 +15229,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+/** Copyright (c) 2020 GitHub. This code is licensed under MIT license (see LICENSE(https://github.com/github/event-transformer/blob/feature/chatops/LICENSE) for details) */
+/* eslint-disable class-methods-use-this */
 const TemplateEngineFactory_1 = __importDefault(__webpack_require__(826));
 const Utility_1 = __importDefault(__webpack_require__(855));
 class Transformer {
@@ -15258,7 +15250,6 @@ class Transformer {
      * Fetch template file and register with appropriate template engine
      *
      * @param {boolean} fromRepo - is an from repo or a local machine lookup
-     * @param {string} sameRepo - file path of the config
      * @param {string} repo - repo with the config
      * @param {string} branch - branch with the config
      * @param {string} path - url/local path for the template file
@@ -15266,8 +15257,8 @@ class Transformer {
      * @param {TemplateType} templateType - type of templating engine ex. Handlebars, Liquid
      * @param {string} accessToken - access token for private repo
      */
-    async readAndRegisterTemplate(fromRepo, sameRepo, repo, branch, path, key, templateType, accessToken) {
-        const templateFile = await Utility_1.default.fetchFile(fromRepo, sameRepo, repo, branch, path, accessToken);
+    async readAndRegisterTemplate(fromRepo, repo, branch, path, key, templateType, accessToken) {
+        const templateFile = await Utility_1.default.fetchFile(fromRepo, repo, branch, path, accessToken);
         const templateEngine = TemplateEngineFactory_1.default.getInstance().getTemplateEngine(templateType);
         templateEngine.registerTemplate(key, templateFile);
     }
@@ -17488,14 +17479,14 @@ class TemplateManager {
      * @throws Error if setup fails
      */
     static async setupTemplateConfiguration(configFilePath, customOptions) {
-      var _a;
+        var _a;
         try {
-            const transformerConfig = await this.readConfigFile(configFilePath, true, '', '', false);
+            const transformerConfig = await this.readConfigFile(configFilePath, '', '', false);
             (_a = customOptions === null || customOptions === void 0 ? void 0 : customOptions.engineOptions) === null || _a === void 0 ? void 0 : _a.forEach(engineOption => {
-              this.registerHelpersAndTags(engineOption);
-          });
-            await this.registerAllTemplates(false, true, new CardRenderer_1.default(), transformerConfig.cardRenderer, '', '');
-            await this.registerAllTemplates(false, true, new EventTransformer_1.default(), transformerConfig.eventTransformer, '', '');
+                this.registerHelpersAndTags(engineOption);
+            });
+            await this.registerAllTemplates(false, new CardRenderer_1.default(), transformerConfig.cardRenderer, '', '');
+            await this.registerAllTemplates(false, new EventTransformer_1.default(), transformerConfig.eventTransformer, '', '');
         }
         catch (error) {
             if (error instanceof TemplateError_1.TemplateEngineNotFound || error instanceof TemplateError_1.TemplateParseError
@@ -17522,12 +17513,12 @@ class TemplateManager {
      * @throws Error if setup fails
      */
     static async setupTemplateConfigurationFromRepo(repo, branch, sourceType, templateType, clientType, accessToken, customOptions) {
-      var _a;
+        var _a;
         try {
-            const transformerConfig = await this.readConfigFile('TransformerConfig.json', false, repo, branch, true);
+            const transformerConfig = await this.readConfigFile('TransformerConfig.json', repo, branch, true, accessToken);
             (_a = customOptions === null || customOptions === void 0 ? void 0 : customOptions.engineOptions) === null || _a === void 0 ? void 0 : _a.forEach(engineOption => {
-              this.registerHelpersAndTags(engineOption);
-          });
+                this.registerHelpersAndTags(engineOption);
+            });
             if (sourceType != null && templateType != null) {
                 if (clientType != null) {
                     await this.registerSpecificTemplate(true, new CardRenderer_1.default(), transformerConfig.cardRenderer, repo, branch, sourceType, templateType, clientType, accessToken);
@@ -17537,8 +17528,8 @@ class TemplateManager {
                 }
             }
             else {
-                await this.registerAllTemplates(true, false, new CardRenderer_1.default(), transformerConfig.cardRenderer, repo, branch);
-                await this.registerAllTemplates(true, false, new EventTransformer_1.default(), transformerConfig.eventTransformer, repo, branch);
+                await this.registerAllTemplates(true, new CardRenderer_1.default(), transformerConfig.cardRenderer, repo, branch);
+                await this.registerAllTemplates(true, new EventTransformer_1.default(), transformerConfig.eventTransformer, repo, branch);
             }
         }
         catch (error) {
@@ -17556,18 +17547,17 @@ class TemplateManager {
      * Read config file and deserialize the file appropriately
      *
      * @param {string} filePath - file path of the config
-     * @param {string} sameRepo - file path of the config
      * @param {string} repo - repo with the config
      * @param {string} branch - branch with the config
      * @param {boolean} fromRepo - specifies if file from repo or from local machine
      */
-    static async readConfigFile(filePath, sameRepo, repo, branch, fromRepo, accessToken) {
-        const data = await Utility_1.default.fetchFile(fromRepo, sameRepo, repo, branch, filePath, accessToken);
+    static async readConfigFile(filePath, repo, branch, fromRepo, accessToken) {
+        const data = await Utility_1.default.fetchFile(fromRepo, repo, branch, filePath, accessToken);
         try {
             return JSON.parse(data.toString());
         }
         catch (error) {
-            throw new FileError_1.FileParseError(`Unable to parse config file from path 
+            throw new FileError_1.FileParseError(`Unable to parse config file from path
       ${filePath}, original error message: ${error.message}`);
         }
     }
@@ -17575,23 +17565,22 @@ class TemplateManager {
      * Register all templates provided in the transformerConfig
      *
      * @param {boolean} fromRepo - is an from repo or a local machine lookup
-     * @param {string} sameRepo - file path of the config
      * @param {string} transformer - transformer whith which template should be registered
      * @param {BaseTransformConfigEntry} transformerConfigs - the template transformer configs
      * @param {string} repo - repo with the config
      * @param {string} branch - branch with the config
      * @param {string} accessToken - access token for private repo
      */
-    static async registerAllTemplates(fromRepo, sameRepo, transformer, transformerConfigs, repo, branch, accessToken) {
+    static async registerAllTemplates(fromRepo, transformer, transformerConfigs, repo, branch, accessToken) {
         // eslint-disable-next-line no-restricted-syntax
         for (const element of transformerConfigs) {
             try {
                 // eslint-disable-next-line no-await-in-loop
-                await transformer.registerTemplate(fromRepo, sameRepo, repo, branch, element, accessToken);
+                await transformer.registerTemplate(fromRepo, repo, branch, element, accessToken);
             }
             catch (error) {
                 if (error instanceof TemplateError_1.TemplateParseError) {
-                    throw new TemplateError_1.TemplateParseError(`Failed to parse template with name: ${element.TemplateName} 
+                    throw new TemplateError_1.TemplateParseError(`Failed to parse template with name: ${element.TemplateName}
           for source type: ${element.SourceType} and template type: ${element.TemplateType}`);
                 }
                 else {
@@ -17600,27 +17589,27 @@ class TemplateManager {
             }
         }
     }
-     /**
+    /**
      * Registers custom helpers and tags for a specific template engine
      *
      * @param {CustomEngineOptions} engineOption template type and the list of
      * custom helpers and tag to register
      */
     static registerHelpersAndTags(engineOption) {
-      const engine = TemplateEngineFactory_1.default.getInstance().getTemplateEngine(engineOption.templateType);
-      const helpers = engineOption.customHelpers;
-      if (helpers) {
-          Object.keys(helpers).forEach(helperName => {
-              engine.registerHelper(helperName, helpers[helperName]);
-          });
-      }
-      const tags = engineOption.customTags;
-      if (tags) {
-          Object.keys(tags).forEach(tagName => {
-              engine.registerTag(tagName, tags[tagName]);
-          });
-      }
-  }
+        const engine = TemplateEngineFactory_1.default.getInstance().getTemplateEngine(engineOption.templateType);
+        const helpers = engineOption.customHelpers;
+        if (helpers) {
+            Object.keys(helpers).forEach(helperName => {
+                engine.registerHelper(helperName, helpers[helperName]);
+            });
+        }
+        const tags = engineOption.customTags;
+        if (tags) {
+            Object.keys(tags).forEach(tagName => {
+                engine.registerTag(tagName, tags[tagName]);
+            });
+        }
+    }
     /**
      * Register template provided in the transformerConfig for the sourceType
      *
@@ -17641,11 +17630,11 @@ class TemplateManager {
                 (typeof element.ClientType === 'undefined' || element.ClientType === clientType)) {
                 try {
                     // eslint-disable-next-line no-await-in-loop
-                    await transformer.registerTemplate(fromRepo, false, repo, branch, element, accessToken);
+                    await transformer.registerTemplate(fromRepo, repo, branch, element, accessToken);
                 }
                 catch (error) {
                     if (error instanceof TemplateError_1.TemplateParseError) {
-                        throw new TemplateError_1.TemplateParseError(`Failed to parse template with name: ${element.TemplateName} 
+                        throw new TemplateError_1.TemplateParseError(`Failed to parse template with name: ${element.TemplateName}
             for source type: ${element.SourceType} and template type: ${element.TemplateType}`);
                     }
                     else {
@@ -17771,27 +17760,16 @@ class CardRenderer extends Transformer_1.default {
      * *** Internal function not exposed to outside the package ***
      *
      * @param {boolean} fromRepo - is an from repo or a local machine lookup
-     * @param {boolean} sameRepo - is handlebar in the same repo
      * @param {string} repo - repo with the config
      * @param {string} branch - branch with the config
      * @param {CardRendererConfigEntry} transformConfig - config details of the template to register
      * @param {string} accessToken - access token for private repo
      */
-    async registerTemplate(fromRepo, sameRepo, repo, branch, transformConfig, accessToken) {
-        let basepath;
-        let path;
-        let key;
-        if (sameRepo === true) {
-            basepath = 'CardTemplate';
-            path = `${basepath}/${transformConfig.ClientType}/${transformConfig.TemplateType}/${transformConfig.TemplateName}`;
-            key = Utility_1.default.keyGenerator(CardRenderer.KEY_PREFIX, transformConfig.TemplateType, transformConfig.SourceType, transformConfig.ClientType);
-        }
-        else {
-            basepath = fromRepo ? '/CardTemplate' : 'CardTemplate';
-            path = `${basepath}/${transformConfig.ClientType}/${transformConfig.TemplateType}/${transformConfig.TemplateName}`;
-            key = Utility_1.default.keyGenerator(CardRenderer.KEY_PREFIX, transformConfig.TemplateType, transformConfig.SourceType, transformConfig.ClientType);
-        }
-        await this.readAndRegisterTemplate(fromRepo, sameRepo, repo, branch, path, key, transformConfig.TemplateType, accessToken);
+    async registerTemplate(fromRepo, repo, branch, transformConfig, accessToken) {
+        const basepath = fromRepo ? '/CardTemplate' : 'CardTemplate';
+        const path = `${basepath}/${transformConfig.ClientType}/${transformConfig.TemplateType}/${transformConfig.TemplateName}`;
+        const key = Utility_1.default.keyGenerator(CardRenderer.KEY_PREFIX, transformConfig.TemplateType, transformConfig.SourceType, transformConfig.ClientType);
+        await this.readAndRegisterTemplate(fromRepo, repo, branch, path, key, transformConfig.TemplateType, accessToken);
     }
 }
 exports.default = CardRenderer;
@@ -21923,18 +21901,14 @@ class Utility {
      * Fetch file either from local machine or using an http call
      *
      * @param {boolean} fromRepo - is an from repo or a local machine lookup
-     * @param {boolean} sameRepo - is config file in the same repo
      * @param {string} repo - name of the repository
      * @param {boolean} branch - name of the branch
      * @param {string} filePath - the path of the file to read
      */
-    static async fetchFile(fromRepo, sameRepo, repo, branch, filePath, accessToken) {
+    static async fetchFile(fromRepo, repo, branch, filePath, accessToken) {
         let file = '';
         try {
-            if (sameRepo) {
-                file = fs.readFileSync(path.resolve(filePath)).toString();
-            }
-            else if (fromRepo) {
+            if (fromRepo) {
                 file = await this.getFile(repo, branch, filePath, accessToken);
             }
             else {
@@ -21942,7 +21916,7 @@ class Utility {
             }
         }
         catch (error) {
-            throw new FileError_1.FileReadError(`Could not read file with 
+            throw new FileError_1.FileReadError(`Could not read file with
         file path: ${filePath} \n ERROR: ${error.message}`);
         }
         if (!file || file.length <= 0) {
@@ -23589,10 +23563,9 @@ function passLookupPropertyOption(helper, container) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-/** Copyright (c) 2020 GitHub. This code is licensed under MIT license (see LICENSE(https://github.com/github/event-transformer/blob/feature/chatops/LICENSE) for details) */
 const liquidjs_1 = __webpack_require__(252);
-const TemplateError_1 = __webpack_require__(958);
 const FunctionalityError_1 = __webpack_require__(475);
+const TemplateError_1 = __webpack_require__(958);
 class LiquidTemplateEngine {
     constructor() {
         this.preCompiledTemplateMap = new Map();
@@ -23631,7 +23604,7 @@ class LiquidTemplateEngine {
         }
         return this.engine.renderSync(preCompiledTemplate, dataModel);
     }
-     /**
+    /**
       * Register custom helper functions with template engine.
       *
       * @param helperName name of the helper to register
@@ -23639,27 +23612,27 @@ class LiquidTemplateEngine {
       */
     // eslint-disable-next-line class-methods-use-this
     registerHelper(helperName, helperFunc) {
-      try {
-          this.engine.registerFilter(helperName, helperFunc);
-      }
-      catch (error) {
-          throw new FunctionalityError_1.CustomHelperRegisterError(`Registration of custom helper: ${helperName} failed with ERROR: ${error.message} `);
-      }
-  }
-  /**
-  * Register custom tag with template engine.
-  *
-  * @param tagName name of the tag to register
-  * @param tagOptions tagOptions specific to the template engine
-  */
-  // eslint-disable-next-line class-methods-use-this
-  registerTag(tagName, tagOptions) {
-      try {
-          this.engine.registerTag(tagName, tagOptions);
-      }
-      catch (error) {
-          throw new FunctionalityError_1.CustomTagRegisterError(`Registration of custom Tag: ${tagName} failed with ERROR: ${error.message}`);
-      }
+        try {
+            this.engine.registerFilter(helperName, helperFunc);
+        }
+        catch (error) {
+            throw new FunctionalityError_1.CustomHelperRegisterError(`Registration of custom helper: ${helperName} failed with ERROR: ${error.message} `);
+        }
+    }
+    /**
+    * Register custom tag with template engine.
+    *
+    * @param tagName name of the tag to register
+    * @param tagOptions tagOptions specific to the template engine
+    */
+    // eslint-disable-next-line class-methods-use-this
+    registerTag(tagName, tagOptions) {
+        try {
+            this.engine.registerTag(tagName, tagOptions);
+        }
+        catch (error) {
+            throw new FunctionalityError_1.CustomTagRegisterError(`Registration of custom Tag: ${tagName} failed with ERROR: ${error.message}`);
+        }
     }
 }
 exports.default = LiquidTemplateEngine;
