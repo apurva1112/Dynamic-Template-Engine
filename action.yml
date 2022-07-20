@@ -4,7 +4,7 @@ author: 'hackit-team'
 inputs:
   accessToken:
     description: 'access token available in the workflow file to authenticate call to github api'
-    default: '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'
+    default: null
   repoName:
     description: 'input repo for templates here'
     required: true
