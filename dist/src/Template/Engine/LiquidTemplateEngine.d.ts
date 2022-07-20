@@ -1,3 +1,4 @@
+import { FilterImplOptions, TagImplOptions } from 'liquidjs';
 import ITemplateEngine from '../Core/ITemplateEngine';
 export default class LiquidTemplateEngine implements ITemplateEngine {
     constructor();
@@ -17,6 +18,20 @@ export default class LiquidTemplateEngine implements ITemplateEngine {
      * @param {JSON} dataModel - data to apply to the template
      */
     applyTemplate(templateId: string, dataModel: JSON): string;
+    /**
+      * Register custom helper functions with template engine.
+      *
+      * @param helperName name of the helper to register
+      * @param helperFunc the implementation of helper function
+      */
+    registerHelper(helperName: string, helperFunc: FilterImplOptions): void;
+    /**
+    * Register custom tag with template engine.
+    *
+    * @param tagName name of the tag to register
+    * @param tagOptions tagOptions specific to the template engine
+    */
+    registerTag(tagName: string, tagOptions: TagImplOptions): void;
     private engine;
     private preCompiledTemplateMap;
 }

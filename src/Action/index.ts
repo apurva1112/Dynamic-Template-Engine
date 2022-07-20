@@ -27,12 +27,22 @@ async function run(): Promise<void> {
     const branch: string = core.getInput('branchName', options);
     const templateTypeString = core.getInput('templateType', options);
     const sourceType: string = core.getInput('sourceType', options);
-    const clientTypeString: string = core.getInput('clientType');
-    const accessToken: string = core.getInput('accessToken');
+    const clientTypeString: string = 'slack';
+    const accessToken: string = core.getInput('accessToken', options);
+    const customHelperString: string = core.getInput('customHelpers');
+    const customHelpers = JSON.parse(customHelperString);
+    const customHelperWithFunc: {[helperName: string]: any} = {};
+    Object.entries(customHelpers).forEach(k => {
+        customHelperWithFunc[k[0]] = eval(k[1] as string);
+    });
+    const customTemplatingOptions: CustomTemplatingOptions = {
+      engineOptions: []
+    };
+    const transformerInSameRepo: string = core.getInput('transformerInSameRepo');
     let data: string = core.getInput('data');
     core.debug(`Data Received: ${data}`);
-    core.debug(`Trying to remove invisble characters`);
-    data = data.replace(/\\n/g, '\\n')
+    core.debug('Trying to remove invisble characters');
+    data = data.replace(/\\n/g, '\\n') 
       .replace(/\\'/g, "\\'")
       .replace(/\\"/g, '\\"')
       .replace(/\\&/g, '\\&')
@@ -44,7 +54,32 @@ async function run(): Promise<void> {
     data = data.replace(/[\u0000-\u0019]+/g, '');
     core.debug(`Data After CleanUp: ${data}`);
     const dataJson: JSON = JSON.parse(data);
-    core.debug(`Done parsing input data`);
+
+    let d1 = `{
+      steps: [`;
+    
+    let d2 = [];
+    
+    let d3 = `
+      ]
+    }`;  
+    
+    for(let key in dataJson) {
+      let out = '';
+      for(let k in dataJson[key].outputs) {
+        d2 = [...d2,
+          {
+              name: key,
+              outcome: dataJson[key].outcome,
+              outputs: dataJson[key].outputs
+          } 
+      ];
+    }
+    
+    console.log({ steps: d2 });
+    const payload = {steps: d2};
+    core.debug(payload.stringify());
+    core.debug('Done parsing input data');
     const templateType: TemplateType = throwIfUndefined<TemplateType>(
       TemplateTypeMap.get(templateTypeString),
     );
@@ -55,16 +90,20 @@ async function run(): Promise<void> {
       );
     }
     let renderedTemplate: string;
-    await TemplateManager.setupTemplateConfigurationFromRepo(repoName, branch, sourceType,
-      templateType, clientType, accessToken);
+    // if (transformerInSameRepo === 'false') {
+      await TemplateManager.setupTemplateConfigurationFromRepo(repoName, branch, sourceType,
+        templateType, clientType, accessToken);
+    // } else {
+    //   await TemplateManager.setupTemplateConfiguration('TransformerConfig.json', customTemplatingOptions);
+    // }
     if (clientType != null) {
       const cardRenderer = new CardRenderer();
       renderedTemplate = await cardRenderer.ConstructCardJson(templateType, sourceType, clientType,
-        dataJson);
+        payload);
     } else {
       const eventTransformer = new EventTransformer();
       renderedTemplate = await eventTransformer.ConstructEventJson(templateType, sourceType,
-        dataJson);
+        payload);
     }
     core.debug(`Calculated template: ${renderedTemplate}`);
     renderedTemplate = JSON.parse(renderedTemplate);
@@ -79,7 +118,7 @@ async function run(): Promise<void> {
       client_payload: renderedTemplate,
     });
   } catch (error) {
-    core.setFailed(error);
+    core.setFailed(error as any);
   }
 }
 

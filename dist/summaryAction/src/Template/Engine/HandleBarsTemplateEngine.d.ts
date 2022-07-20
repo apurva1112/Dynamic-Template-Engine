@@ -1,3 +1,5 @@
+/** Copyright (c) 2020 GitHub. This code is licensed under MIT license (see LICENSE(https://github.com/github/event-transformer/blob/feature/chatops/LICENSE) for details) */
+import * as Handlebars from 'handlebars';
 import ITemplateEngine from '../Core/ITemplateEngine';
 export default class HandleBarsTemplateEngine implements ITemplateEngine {
     constructor();
@@ -17,5 +19,18 @@ export default class HandleBarsTemplateEngine implements ITemplateEngine {
      * @param {JSON} dataModel - data to apply to the template
      */
     applyTemplate(templateId: string, dataModel: JSON): string;
+    /**
+      * Register custom helper functions with template engine.
+      *
+      * @param helperName name of the helper to register
+      * @param helperFunc the implementation of helper function
+      */
+    registerHelper(helperName: string, helperFunc: Handlebars.HelperDelegate): void;
+    /**
+    * Register custom tag with template engine.
+    *
+    * @throws FunctionalityNotSupportedError if the engine does not support custom tags/extensions
+    */
+    registerTag(): void;
     private preCompiledTemplateMap;
 }
