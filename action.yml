@@ -1,18 +1,18 @@
 name: 'Event Transformer'
 description: 'Templating on the go'
-author: 'anuraag016'
+author: 'hackit-team'
 inputs:
   accessToken:
     description: 'access token available in the workflow file to authenticate call to github api'
-    default: ${{ github.token }}
+    default: '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'
   repoName:
     description: 'input repo for templates here'
     required: true
-    default: ${{ github.repository }}
+    default: 'github/chat-templates'
   branchName:
     description: 'branch name here'
     required: true
-    default: ${{ github.event.repository.default_branch }}
+    default: 'main'
   transformerInSameRepo:
     description: 'Is repository same as the current repo'
     default: 'false'

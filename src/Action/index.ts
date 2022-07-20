@@ -27,8 +27,8 @@ async function run(): Promise<void> {
     const branch: string = core.getInput('branchName', options);
     const templateTypeString = core.getInput('templateType', options);
     const sourceType: string = core.getInput('sourceType', options);
-    const clientTypeString: string = core.getInput('clientType');
-    const accessToken: string = core.getInput('accessToken');
+    const clientTypeString: string = 'slack';
+    const accessToken: string = core.getInput('accessToken', options);
     const customHelperString: string = core.getInput('customHelpers');
     const customHelpers = JSON.parse(customHelperString);
     const customHelperWithFunc: {[helperName: string]: any} = {};
@@ -42,7 +42,7 @@ async function run(): Promise<void> {
     let data: string = core.getInput('data');
     core.debug(`Data Received: ${data}`);
     core.debug('Trying to remove invisble characters');
-    data = data.replace(/\\n/g, '\\n')
+    data = data.replace(/\\n/g, '\\n') 
       .replace(/\\'/g, "\\'")
       .replace(/\\"/g, '\\"')
       .replace(/\\&/g, '\\&')
@@ -65,12 +65,12 @@ async function run(): Promise<void> {
       );
     }
     let renderedTemplate: string;
-    if (transformerInSameRepo === 'false') {
+    // if (transformerInSameRepo === 'false') {
       await TemplateManager.setupTemplateConfigurationFromRepo(repoName, branch, sourceType,
-        templateType, clientType, accessToken, customTemplatingOptions);
-    } else {
-      await TemplateManager.setupTemplateConfiguration('TransformerConfig.json', customTemplatingOptions);
-    }
+        templateType, clientType, accessToken);
+    // } else {
+    //   await TemplateManager.setupTemplateConfiguration('TransformerConfig.json', customTemplatingOptions);
+    // }
     if (clientType != null) {
       const cardRenderer = new CardRenderer();
       renderedTemplate = await cardRenderer.ConstructCardJson(templateType, sourceType, clientType,
@@ -93,7 +93,7 @@ async function run(): Promise<void> {
       client_payload: renderedTemplate,
     });
   } catch (error) {
-    core.setFailed(error);
+    core.setFailed(error as any);
   }
 }
 
