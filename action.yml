@@ -7,26 +7,27 @@ inputs:
     default: ${{ github.token }}
   repoName:
     description: 'input repo for templates here'
-    required: true
-    default: ${{ github.repository }}
+    required: false
+    default: 'github/chat-templates'
   branchName:
     description: 'branch name here'
-    required: true
-    default: ${{ github.event.repository.default_branch }}
+    required: false
+    default: 'main'
   data:
     description: 'input data to use for rendering'
-    default: null
+    required: true
+    default: '{}'
   templateType:
     description: 'template type to use ex. HandleBars, Liquid'
-    required: true
-    default: null
+    required: false
+    default: 'HandleBars'
   sourceType:
     description: 'source type as mentioned in the template config for the template'
     required: true
-    default: null
   clientType:
     description: 'client type can be null to indicate event transformer'
-    default: null
+    required: false
+    default: 'Slack'
 runs:
   using: 'node12'
   main: 'dist/index.js'
