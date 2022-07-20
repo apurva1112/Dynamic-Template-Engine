@@ -54,6 +54,26 @@ async function run(): Promise<void> {
     data = data.replace(/[\u0000-\u0019]+/g, '');
     core.debug(`Data After CleanUp: ${data}`);
     const dataJson: JSON = JSON.parse(data);
+
+    let d1 = `{
+      steps: [`;
+    
+    let d2 = [];
+    
+    let d3 = `
+      ]
+    }`;  
+    
+    for(let key in dataJson) {
+        d2 = [...d2,
+            {name: `${key}`,
+            outcome: `${dataJson[key].outcome}`} 
+        ] as any;
+    }
+    
+    console.log({ steps: d2 });
+    const s = {steps: d2};
+    core.debug(s.stringify());
     core.debug('Done parsing input data');
     const templateType: TemplateType = throwIfUndefined<TemplateType>(
       TemplateTypeMap.get(templateTypeString),
