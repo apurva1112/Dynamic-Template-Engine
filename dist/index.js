@@ -10594,7 +10594,7 @@ async function run() {
         const sourceType = core.getInput('sourceType', options);
         const clientTypeString = core.getInput('clientType');
         const accessToken = core.getInput('accessToken');
-        let data = core.getInput('data');
+        let data = JSON.parse(core.getInput('data'));
         core.debug(`Data Received: ${data}`);
         core.debug(`Trying to remove invisble characters`);
         data = data.replace(/\\n/g, '\\n')
