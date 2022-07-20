@@ -65,15 +65,20 @@ async function run(): Promise<void> {
     }`;  
     
     for(let key in dataJson) {
+      let out = '';
+      for(let k in dataJson[key].outputs) {
         d2 = [...d2,
-            {name: `${key}`,
-            outcome: `${dataJson[key].outcome}`} 
-        ] as any;
+          {
+              name: key,
+              outcome: dataJson[key].outcome,
+              outputs: dataJson[key].outputs
+          } 
+      ];
     }
     
     console.log({ steps: d2 });
-    const s = {steps: d2};
-    core.debug(s.stringify());
+    const payload = {steps: d2};
+    core.debug(payload.stringify());
     core.debug('Done parsing input data');
     const templateType: TemplateType = throwIfUndefined<TemplateType>(
       TemplateTypeMap.get(templateTypeString),
@@ -94,11 +99,11 @@ async function run(): Promise<void> {
     if (clientType != null) {
       const cardRenderer = new CardRenderer();
       renderedTemplate = await cardRenderer.ConstructCardJson(templateType, sourceType, clientType,
-        dataJson);
+        payload);
     } else {
       const eventTransformer = new EventTransformer();
       renderedTemplate = await eventTransformer.ConstructEventJson(templateType, sourceType,
-        dataJson);
+        payload);
     }
     core.debug(`Calculated template: ${renderedTemplate}`);
     renderedTemplate = JSON.parse(renderedTemplate);
