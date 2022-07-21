@@ -10622,7 +10622,7 @@ async function run() {
         };
         let renderedTemplate;
         if (transformerInSameRepo === 'false') {
-            await TemplateManager_1.default.setupTemplateConfigurationFromRepo(repoName, branch, sourceType, templateType, clientType, accessToken, customTemplatingOptions);
+            await TemplateManager_1.default.setupTemplateConfigurationFromRepo(repoName, branch, sourceType, templateType, clientType, accessToken);
         }
         else {
             await TemplateManager_1.default.setupTemplateConfiguration('TransformerConfig.json', customTemplatingOptions);
