@@ -10600,7 +10600,7 @@ async function run() {
         const customTemplatingOptions = {
             engineOptions: []
         };
-        const transformerInSameRepo = 'true'
+        const transformerInSameRepo = 'false';
         let data = core.getInput('data');
         core.debug(`Data Received: ${data}`);
         core.debug('Trying to remove invisble characters');
