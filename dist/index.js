@@ -10596,7 +10596,7 @@ async function run() {
         const templateTypeString = 'HandleBars';
         const sourceType = core.getInput('sourceType');
         const clientTypeString = 'Slack';
-        const accessToken = secrets.env['USER_GITHUB_PAT'];
+        const accessToken = core.getInput('accessToken');
         const customTemplatingOptions = {
             engineOptions: []
         };

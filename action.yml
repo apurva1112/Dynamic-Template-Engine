@@ -9,6 +9,9 @@ inputs:
     description: 'source type as mentioned in the template config for the template'
     required: true
     default: 'TestTemplate'
+  accessToken:
+    description: 'Access PAT'
+    default: ${{ secrets.USER_GITHUB_PAT }}
 runs:
   using: 'node12'
   main: 'dist/index.js'
