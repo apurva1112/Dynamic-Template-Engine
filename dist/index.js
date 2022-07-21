@@ -10615,6 +10615,7 @@ async function run() {
         core.debug(`Data After CleanUp: ${data}`);
         const dataJson = JSON.parse(data);
         core.debug('Done parsing input data');
+        core.debug(`dataJson: ${dataJson}`);
         const templateType = throwIfUndefined(TemplateTypeMap.get(templateTypeString));
         let clientType;
         if (clientTypeString) {
