@@ -10591,23 +10591,16 @@ function throwIfUndefined(value) {
 }
 async function run() {
     try {
-        const options = { required: true };
-        const repoName = core.getInput('repoName', options);
-        const branch = core.getInput('branchName', options);
-        const templateTypeString = core.getInput('templateType', options);
-        const sourceType = core.getInput('sourceType', options);
-        const clientTypeString = core.getInput('clientType');
-        const accessToken = core.getInput('accessToken');
-        const customHelperString = core.getInput('customHelpers');
-        const customHelpers = JSON.parse(customHelperString);
-        const customHelperWithFunc = {};
-        Object.entries(customHelpers).forEach(k => {
-            customHelperWithFunc[k[0]] = eval(k[1]);
-        });
+        const repoName = 'github/chat-templates';
+        const branch = 'main';
+        const templateTypeString = 'HandleBars';
+        const sourceType = core.getInput('sourceType');
+        const clientTypeString = 'Slack';
+        const accessToken = github.token;
         const customTemplatingOptions = {
             engineOptions: []
         };
-        const transformerInSameRepo = core.getInput('transformerInSameRepo');
+        const transformerInSameRepo = 'true';
         let data = core.getInput('data');
         core.debug(`Data Received: ${data}`);
         core.debug('Trying to remove invisble characters');

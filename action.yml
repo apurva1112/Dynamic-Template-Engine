@@ -2,37 +2,13 @@ name: 'Event Transformer'
 description: 'Templating on the go'
 author: 'hackit-team'
 inputs:
-  accessToken:
-    description: 'access token available in the workflow file to authenticate call to github api'
-    default: null
-  repoName:
-    description: 'input repo for templates here'
-    required: true
-    default: 'github/chat-templates'
-  branchName:
-    description: 'branch name here'
-    required: true
-    default: 'main'
-  transformerInSameRepo:
-    description: 'Is repository same as the current repo'
-    default: 'false'
   data:
     description: 'input data to use for rendering'
-    default: null
-  templateType:
-    description: 'template type to use ex. HandleBars, Liquid'
-    required: true
-    default: null
+    default: '{}'
   sourceType:
     description: 'source type as mentioned in the template config for the template'
     required: true
-    default: null
-  clientType:
-    description: 'client type can be null to indicate event transformer'
-    default: null
-  customHelpers:
-    description: 'Custom helpers can be null'
-    default: null
+    default: 'TestTemplate'
 runs:
   using: 'node12'
   main: 'dist/index.js'
