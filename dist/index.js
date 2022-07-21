@@ -10600,7 +10600,7 @@ async function run() {
         const customTemplatingOptions = {
             engineOptions: []
         };
-        const transformerInSameRepo = 'true';
+        const transformerInSameRepo = 'true'
         let data = core.getInput('data');
         core.debug(`Data Received: ${data}`);
         core.debug('Trying to remove invisble characters');
@@ -10621,15 +10621,7 @@ async function run() {
         let clientType;
         if (clientTypeString) {
             clientType = throwIfUndefined(ClientTypeMap.get(clientTypeString));
-        }
-
-        const customEngineOptions = {
-          templateType: templateType,
-          customHelpers: customHelperWithFunc
-      };
-      customTemplatingOptions.engineOptions = [customEngineOptions];
-      core.debug(`CustomTemplatingOptions: ${customTemplatingOptions}`);
-      core.debug(`CustomEngineOptions: ${customTemplatingOptions.engineOptions[0]}`);
+        };
         let renderedTemplate;
         if (transformerInSameRepo === 'false') {
             await TemplateManager_1.default.setupTemplateConfigurationFromRepo(repoName, branch, sourceType, templateType, clientType, accessToken, customTemplatingOptions);
