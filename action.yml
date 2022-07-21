@@ -8,7 +8,7 @@ inputs:
   sourceType:
     description: 'source type as mentioned in the template config for the template'
     required: true
-    default: 'TestTemplate'
+    default: 'TestcaseTemplate'
   accessToken:
     description: 'Access PAT'
     required: true
