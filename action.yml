@@ -11,7 +11,8 @@ inputs:
     default: 'TestTemplate'
   accessToken:
     description: 'Access PAT'
-    default: ${{ secrets.USER_GITHUB_PAT }}
+    required: true
+    default: ''
 runs:
   using: 'node12'
   main: 'dist/index.js'

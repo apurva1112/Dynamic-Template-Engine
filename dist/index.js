@@ -10597,9 +10597,7 @@ async function run() {
         const sourceType = core.getInput('sourceType');
         const clientTypeString = 'Slack';
         const accessToken = core.getInput('accessToken');
-        const customTemplatingOptions = {
-            engineOptions: []
-        };
+        core.info(`accessToken - ${accessToken}`);
         const transformerInSameRepo = 'false';
         let data = core.getInput('data');
         core.debug(`Data Received: ${data}`);
